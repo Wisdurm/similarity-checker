@@ -1,4 +1,4 @@
-Give links to a Github files and it will determine how similar the files are.  
+Give links to Github files and it will determine how similar the files are.  
 You can also import a file which contains a list of links to Github files.  
 There is no special format, just each link on it's own line.
 
