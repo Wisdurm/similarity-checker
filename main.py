@@ -26,7 +26,7 @@ def compare_tag(tag: str) -> dict[str, dict[str, float]]:
     files = [join(directory_path, f) for f in listdir(directory_path) if isfile(join(directory_path, f))]
     # Compare files
     results = diffing.compare_all_files(files, 0)
-    # Format names
+    # Format filepaths into purely names
     formatted_results = {}
     for key, value in results.items():
         # Format subdict
@@ -37,7 +37,6 @@ def compare_tag(tag: str) -> dict[str, dict[str, float]]:
         # Format higher level dict
         new_key: str = str(key).split('/')[-1]
         formatted_results[new_key] = f_values
-
 
     return formatted_results
 
@@ -53,7 +52,7 @@ def download_link(link: str, tag: str) -> None:
     file_path = join(directory_path, f'{user_name}')
     if 'raw' not in link:
         # Add ?raw=true which will automatically redirect to raw.github.com
-        s = urlsplit(link)._replace(query='raw=true')
+        s = urlsplit(link)._replace(query='raw=true') # This will override existing params but that shouldn't matter
         link = urlunsplit(s)
 
     urllib.request.urlretrieve(link, file_path)
@@ -70,17 +69,23 @@ def checklink():
         # Check if request has file with links, or a single link directly
         if 'link' in data and data['link'] != "":
             link = data['link']
-            download_link(link, tag)
+            try:
+                download_link(link, tag)
+            except:
+                return 'Unable to download file from url'
         elif 'links' in request.files:
             # Save file temporarily
             tmp_path = join(gettempdir(), 'links.txt')
             file = request.files['links']
             file.save(tmp_path)
             # Read
-            with open(tmp_path, "r") as file:
-                links = file.read().splitlines()
-                for link in links:
-                    download_link(link, tag)
+            try:
+                with open(tmp_path, "r") as file:
+                    links = file.read().splitlines()
+                    for link in links:
+                        download_link(link, tag)
+            except:
+                return 'Unable to download file from url'
         # Compare since new files
         _cached_values[tag] = compare_tag(tag)
     # If cache empty, compare
