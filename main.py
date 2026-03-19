@@ -4,8 +4,8 @@ from flask import request
 from werkzeug.utils import secure_filename
 import urllib.request
 import re
-from os import listdir
-from os.path import isfile, join
+from os import listdir, mkdir
+from os.path import isfile, join,  exists
 import diffing
 from pathlib import Path
 from tempfile import gettempdir
@@ -26,19 +26,7 @@ def compare_tag(tag: str) -> dict[str, dict[str, float]]:
     files = [join(directory_path, f) for f in listdir(directory_path) if isfile(join(directory_path, f))]
     # Compare files
     results = diffing.compare_all_files(files, 0)
-    # Format filepaths into purely names
-    formatted_results = {}
-    for key, value in results.items():
-        # Format subdict
-        f_values = {}
-        for k, v in value.items():
-            new_key: str = str(k).split('/')[-1]
-            f_values[new_key] = v
-        # Format higher level dict
-        new_key: str = str(key).split('/')[-1]
-        formatted_results[new_key] = f_values
-
-    return formatted_results
+    return results
 
 def download_link(link: str, tag: str) -> None:
     """
@@ -63,6 +51,15 @@ def checklink():
     tag = request.args.get('tag')
     if tag == None:
         return 'Missing tag from url'
+    # Make sure tag folder exists
+    directory_path = join("files", tag)
+    if not exists(directory_path):
+        try:
+            mkdir(directory_path)
+        except OSError as e:
+            print("ASJIOJDOIJAS")
+            raise OSError(e)
+    # Get post data
     if request.method == 'POST':
         # Get form data
         data = request.form

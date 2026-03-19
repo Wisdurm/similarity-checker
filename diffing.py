@@ -18,8 +18,8 @@ def compare_all_files(files: list[Path], threshold: float) -> dict[Path, dict[Pa
             print(f'ERROR: {com[0]} and {com[1]}')
             continue
         if diff >= threshold:
-            file1 = com[0]
-            file2 = com[1]
+            file1 = str(com[0]).split('/')[-1]
+            file2 = str(com[1]).split('/')[-1]
             # Initialize empty dict
             try:
                 results[file1]
