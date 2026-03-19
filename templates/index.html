@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Main</title>
+		<style>
+			table, th, td {
+			  border: 1px solid black;
+			}
+			.bad {
+				background-color: #FFABAB;
+			}
+		</style>
+	</head>
+	<body>
+		<form method="post" accept-charset="utf-8" enctype=multipart/form-data >
+			<fieldset id="" class="">
+				<legend></legend>
+				<label for="link">Link to file:</label>
+				<input type="text" name="link" id="link">
+				<br>
+				OR
+				<br>
+				<label for="links">File with links:</label>
+				<input type="file" name="links" id="links">
+				<br>
+				<button type="submit">Submit</button>
+			</fieldset>
+		</form>
+		<h1>Comparison results for {{tag}}</h1>
+		<table>
+			<tr>
+				<th>Repository</th>
+				<th>Comparison results</th>
+			</tr>
+			{% for repo, comparisons in results.items() %}
+				<tr>
+					<th>
+						<p>{{repo}}</p>
+					</th>
+					<th>
+						<div style="display: flex; flex-direction: row;">
+							{% for target, diff in comparisons.items() %}
+								{% if loop.index < 6 %}
+									<div style="border: 1px black solid; margin: 5px;"
+											 {% if diff > 0.8 %}
+											 class="bad"
+											 {% endif %}
+										 >
+										<p>{{target}}</p>
+										<p>{{ '{:.0f}'.format(diff*100) }} %</p>
+									</div>
+								{% endif %}
+							{% endfor %}
+						</div>
+					</th>
+				</tr>
+			{% endfor %}
+		</table>
+	</body>
+</html>
